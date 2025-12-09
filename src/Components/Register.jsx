@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { Bounce, toast } from "react-toastify";
 const Register = () => {
   const [formData, setFormData] = useState({
     name: "",
@@ -27,24 +28,43 @@ const Register = () => {
     else if (formData.password.length < 6)
       newErrors.password = "Password must be at least 6 characters";
     if (formData.password !== formData.confirmPassword)
-       (newErrors.confirmPassword = "Passwords do not match");
+      newErrors.confirmPassword = "Passwords do not match";
 
+    if (Object.keys(newErrors).length != 0) return setErrors(newErrors);
     createUserWithEmailAndPassword(auth, formData.email, formData.password)
-  .then((userCredential) => {
-    // Signed up 
-    const user = userCredential.user;
-    console.log(user)
-  })
-  .catch((error) => {
-    const errorCode = error.code;
-    const errorMessage = error.message;
-    console.log(errorCode)
-    
-    
-    // ..
-  });
+      .then((userCredential) => {
+        const user = userCredential.user;
+        console.log(user);
+        toast.info("Register Sucess", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.log(errorCode.split('/')[1].split('-').join(' '));
 
-    console.log(formData)
+     toast.error(errorCode.split('/')[1].split('-').join(' '), {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
+        // ..
+      });
   };
 
   return (
